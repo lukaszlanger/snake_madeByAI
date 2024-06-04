@@ -42,6 +42,48 @@ def message(msg, color):
     mesg = font_style.render(msg, True, color)
     dis.blit(mesg, [dis_width / 6, dis_height / 3])
 
+def fill_screen_with_snake():
+    dis.fill(black)
+    x, y = 0, 0
+    direction = 'RIGHT'
+    length = 1
+    snake_list = [[x, y]]
+
+    while length < (dis_width // snake_block) * (dis_height // snake_block):
+        if direction == 'RIGHT':
+            x += snake_block
+            if x >= dis_width or [x, y] in snake_list:
+                x -= snake_block
+                y += snake_block
+                direction = 'DOWN'
+        elif direction == 'DOWN':
+            y += snake_block
+            if y >= dis_height or [x, y] in snake_list:
+                y -= snake_block
+                x -= snake_block
+                direction = 'LEFT'
+        elif direction == 'LEFT':
+            x -= snake_block
+            if x < 0 or [x, y] in snake_list:
+                x += snake_block
+                y -= snake_block
+                direction = 'UP'
+        elif direction == 'UP':
+            y -= snake_block
+            if y < 0 or [x, y] in snake_list:
+                y += snake_block
+                x += snake_block
+                direction = 'RIGHT'
+
+        snake_list.append([x, y])
+        length += 1
+
+        if length % 2 == 1:  # Dodanie odstępu co drugi krok
+            our_snake(snake_block, snake_list)
+            message("You Lost! Press Q-Quit or C-Play Again", red)
+            pygame.display.update()
+            time.sleep(0.01)
+
 def gameLoop():
     game_over = False
     game_close = False
@@ -76,6 +118,9 @@ def gameLoop():
                         game_close = False
                     if event.key == pygame.K_c:
                         gameLoop()
+
+            fill_screen_with_snake()
+            game_close = False
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
